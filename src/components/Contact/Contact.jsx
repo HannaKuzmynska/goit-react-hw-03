@@ -1,13 +1,21 @@
 import PropTypes from 'prop-types';
+import { FaUser, FaPhone } from 'react-icons/fa';
 import styles from './Contact.module.css';
 
 const Contact = ({ contact, deleteContact }) => {
   return (
     <li className={styles.item}>
-      <p>
-        {contact.name}: {contact.number}
-      </p>
-      <button onClick={() => deleteContact(contact.id)}>Delete</button>
+      <div className={styles.contactDetails}>
+        <div className={styles.contactInfo}>
+          <FaUser className={styles.icon} />
+          <span>{contact.name}</span>
+        </div>
+        <div className={styles.contactInfo}>
+          <FaPhone className={styles.icon} />
+          <span>{contact.number}</span>
+        </div>
+      </div>
+      <button className={styles.deleteButton} onClick={() => deleteContact(contact.id)}>Delete</button>
     </li>
   );
 };

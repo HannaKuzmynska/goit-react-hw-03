@@ -4,6 +4,21 @@ import * as Yup from 'yup';
 import { nanoid } from 'nanoid';
 import styles from './ContactForm.module.css';
 
+const formatPhoneNumber = (value) => {
+  if (!value) return value;
+
+  const phoneNumber = value.replace(/[^\d]/g, '');
+  const phoneNumberLength = phoneNumber.length;
+
+  if (phoneNumberLength < 4) return phoneNumber;
+
+  if (phoneNumberLength < 7) {
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+  }
+
+  return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 5)}-${phoneNumber.slice(5, 7)}`;
+};
+
 const ContactForm = ({ addContact }) => {
   return (
     <Formik
@@ -14,9 +29,7 @@ const ContactForm = ({ addContact }) => {
           .max(50, 'Must be 50 characters or less')
           .required('Required'),
         number: Yup.string()
-          .matches(/^\d+$/, 'The number should contain digits only')
-          .min(3, 'Must be at least 3 digits')
-          .max(15, 'Must be 15 digits or less')
+          .matches(/^\d{3}-\d{2}-\d{2}$/, 'The number should follow the pattern 123-45-67')
           .required('Required'),
       })}
       onSubmit={(values, { setSubmitting, resetForm }) => {
@@ -30,17 +43,27 @@ const ContactForm = ({ addContact }) => {
         setSubmitting(false);
       }}
     >
-      <Form className={styles.form}>
-        <label htmlFor="name">Name</label>
-        <Field name="name" type="text" />
-        <ErrorMessage name="name" component="div" className={styles.error} />
+      {({ values, handleChange }) => (
+        <Form className={styles.form}>
+          <label htmlFor="name">Name</label>
+          <Field name="name" type="text" />
+          <ErrorMessage name="name" component="div" className={styles.error} />
 
-        <label htmlFor="number">Number</label>
-        <Field name="number" type="text" />
-        <ErrorMessage name="number" component="div" className={styles.error} />
+          <label htmlFor="number">Number</label>
+          <Field
+            name="number"
+            type="text"
+            value={values.number}
+            onChange={(e) => {
+              e.target.value = formatPhoneNumber(e.target.value);
+              handleChange(e);
+            }}
+          />
+          <ErrorMessage name="number" component="div" className={styles.error} />
 
-        <button type="submit">Add contact</button>
-      </Form>
+          <button type="submit">Add contact</button>
+        </Form>
+      )}
     </Formik>
   );
 };
